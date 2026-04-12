@@ -20,7 +20,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           USERNAME: ${{ secrets.USERNAME }}
-          CORE: ${{ secrets.CORE }}
+          CORE: ${{ secrets.CORE2 }}
 
       - name: Setup Python
         uses: actions/setup-python@v4
