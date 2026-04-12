@@ -21,10 +21,6 @@ jobs:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           USERNAME: ${{ secrets.USERNAME }}
           CORE: ${{ secrets.CORE }}
-          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-          DEV_API_HASH: ${{ secrets.DEV_API_HASH }}
-          DEV_API_ID: ${{ secrets.DEV_API_ID }}
-          FROOT_STICKER_ID: ${{ secrets.FROOT_STICKER_ID }}
 
       - name: Setup Python
         uses: actions/setup-python@v4
@@ -47,3 +43,8 @@ jobs:
             echo "Crashed. Restarting in 5 seconds..."
             sleep 5
           done
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          DEV_API_HASH: ${{ secrets.DEV_API_HASH }}
+          DEV_API_ID: ${{ secrets.DEV_API_ID }}
+          FROOT_STICKER_ID: ${{ secrets.FROOT_STICKER_ID }}
