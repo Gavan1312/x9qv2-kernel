@@ -16,7 +16,7 @@ jobs:
 
       - name: Get code
         run: |
-          git clone https://${GH_TOKEN}@github.com/${USERNAME}/${CORE}.git
+          git clone https://${GH_TOKEN}@github.com/${USERNAME}/${CORE}.git repo
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           USERNAME: ${{ secrets.USERNAME }}
@@ -33,13 +33,18 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd ${CORE}
+          cd repo
           pip install --upgrade pip
           pip install -r requirements.txt
 
       - name: Run (auto-restart loop)
         run: |
-          cd ${CORE}
+          echo "Listing root:"
+          ls
+          echo "Entering repo:"
+          cd ${CORE} || (echo "CD FAILED" )
+          
+          cd repo
           while true
           do
             echo "Starting bot..."
