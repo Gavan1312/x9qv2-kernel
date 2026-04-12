@@ -39,11 +39,6 @@ jobs:
 
       - name: Run (auto-restart loop)
         run: |
-          echo "Listing root:"
-          ls
-          echo "Entering repo:"
-          cd ${CORE} || (echo "CD FAILED" )
-          
           cd repo
           while true
           do
