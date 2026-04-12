@@ -1,0 +1,50 @@
+name: Run x9qv2-kernel2
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 */6 * * *"   # every 6 hours (safe)
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360   # max allowed (6 hours)
+
+    steps:
+      - name: Checkout (optional)
+        uses: actions/checkout@v3
+
+      - name: Get code
+        run: |
+          git clone https://${GH_TOKEN}@github.com/${USERNAME}/${CORE}.git repo
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          USERNAME: ${{ secrets.USERNAME }}
+          CORE: ${{ secrets.CORE }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          cd repo
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run (auto-restart loop)
+        run: |
+          cd repo
+          while true
+          do
+            echo "Starting bot..."
+            python hfmain.py
+            echo "Crashed. Restarting in 5 seconds..."
+            sleep 5
+          done
+        env:
+          BOT_TOKEN: ${{ secrets.BOT2_TOKEN }}
+          DEV_API_HASH: ${{ secrets.DEV_API_HASH }}
+          DEV_API_ID: ${{ secrets.DEV_API_ID }}
+          FROOT_STICKER_ID: ${{ secrets.FROOT2_STICKER_ID }}
