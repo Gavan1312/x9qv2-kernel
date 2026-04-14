@@ -3,24 +3,24 @@ name: Run x9qv2-kernel
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 */6 * * *"   # every 6 hours (safe)
+    - cron: "0 */5 * * *"   # every 6 hours (safe)
+
+concurrency:
+  group: bot-runner
+  cancel-in-progress: true
 
 jobs:
   run-bot:
     runs-on: ubuntu-latest
-    timeout-minutes: 360   # max allowed (6 hours)
+    timeout-minutes: 290   # max allowed (6 hours)
 
     steps:
-      - name: Checkout (optional)
+      - name: Checkout private repo
         uses: actions/checkout@v3
-
-      - name: Get code
-        run: |
-          git clone https://${GH_TOKEN}@github.com/${USERNAME}/${CORE}.git repo
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-          USERNAME: ${{ secrets.USERNAME }}
-          CORE: ${{ secrets.CORE }}
+        with:
+          repository: ${{ secrets.USERNAME }}/${{ secrets.CORE }}
+          token: ${{ secrets.GH_TOKEN }}
+          path: repo
 
       - name: Setup Python
         uses: actions/setup-python@v4
