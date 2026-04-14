@@ -1,4 +1,4 @@
-name: Run x9qv2-kernel
+name: Run x9qv2-up-kernel2
 
 on:
   workflow_dispatch:
