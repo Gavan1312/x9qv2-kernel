@@ -6,7 +6,7 @@ on:
     - cron: "0 */5 * * *"   # every 6 hours (safe)
 
 concurrency:
-  group: bot-runner
+  group: bot-runner-2
   cancel-in-progress: true
 
 jobs:
