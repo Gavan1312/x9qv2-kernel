@@ -1,9 +1,10 @@
 name: Run x9qv2-kernel
 
+
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 */5 * * *"   # every 6 hours (safe)
+  # schedule:
+  #   - cron: "0 */5 * * *"   # every 6 hours (safe)
 
 concurrency:
   group: bot-runner
