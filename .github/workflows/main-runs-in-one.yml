@@ -69,7 +69,7 @@ jobs:
 
                 BOT_TOKEN=$TOKEN \
                 FROOT_STICKER_ID=$STICKER \
-                python hfmain.py >> ../${NAME// /_}.log 2>&1
+                python hfmain.py 2>&1 | tee -a ../${NAME// /_}.log
               )
 
               EXIT_CODE=$?
@@ -96,7 +96,7 @@ jobs:
           
           sleep 3
 
-          run_bot "Bot 3" repo3 "$BOT3_TOKEN" "$FROOT_STICKER_ID" &
+          run_bot "Bot 3" repo3 "$BOT3_TOKEN" "$FROOT3_STICKER_ID" &
           PID3=$!
 
           echo "Bot 1 PID: $PID1"
@@ -122,7 +122,7 @@ jobs:
 
             if ! is_running $PID3; then
               echo "Bot 3 died. Restarting..."
-              run_bot "Bot 3" repo3 "$BOT3_TOKEN" "$FROOT_STICKER_ID" &
+              run_bot "Bot 3" repo3 "$BOT3_TOKEN" "$FROOT3_STICKER_ID" &
               PID3=$!
               echo "Bot 3 new PID: $PID3"
             fi
@@ -137,3 +137,4 @@ jobs:
           DEV_API_ID: ${{ secrets.DEV_API_ID }}
           FROOT_STICKER_ID: ${{ secrets.FROOT_STICKER_ID }}
           FROOT2_STICKER_ID: ${{ secrets.FROOT2_STICKER_ID }}
+          FROOT3_STICKER_ID: ${{ secrets.FROOT2_STICKER_ID }}
