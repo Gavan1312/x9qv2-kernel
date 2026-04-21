@@ -1,0 +1,100 @@
+name: Run all in one
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 */5 * * *"
+
+concurrency:
+  group: all-main-runner-in-one
+  cancel-in-progress: true
+
+jobs:
+  run-all:
+    runs-on: ubuntu-latest
+    timeout-minutes: 295
+
+    steps:
+      - name: Checkout repo 1
+        uses: actions/checkout@v3
+        with:
+          repository: ${{ secrets.USERNAME }}/${{ secrets.CORE }}
+          token: ${{ secrets.GH_TOKEN }}
+          path: repo1
+
+      - name: Checkout repo 2
+        uses: actions/checkout@v3
+        with:
+          repository: ${{ secrets.USERNAME }}/${{ secrets.CORE2 }}
+          token: ${{ secrets.GH_TOKEN }}
+          path: repo2
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          for dir in repo1 repo2; do
+            cd $dir
+            pip install --upgrade pip
+            pip install -r requirements.txt
+            cd ..
+          done
+
+      - name: Run both bots safely
+        run: |
+          echo "Starting bots..."
+
+          run_bot () {
+            NAME=$1
+            DIR=$2
+
+            while true
+            do
+              echo "$NAME started at $(date)"
+              cd $DIR
+
+              python hfmain.py
+              EXIT_CODE=$?
+
+              echo "$NAME crashed with exit code $EXIT_CODE"
+              echo "Restarting in 5 seconds..."
+
+              cd ..
+              sleep 5
+            done
+          }
+
+          # Run both bots in background
+          run_bot "Bot 1" repo1 &
+          PID1=$!
+
+          run_bot "Bot 2" repo2 &
+          PID2=$!
+
+          # Watchdog loop
+          while true
+          do
+            if ! kill -0 $PID1 2>/dev/null; then
+              echo "Bot 1 process died unexpectedly. Restarting..."
+              run_bot "Bot 1" repo1 &
+              PID1=$!
+            fi
+
+            if ! kill -0 $PID2 2>/dev/null; then
+              echo "Bot 2 process died unexpectedly. Restarting..."
+              run_bot "Bot 2" repo2 &
+              PID2=$!
+            fi
+
+            sleep 10
+          done
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          BOT2_TOKEN: ${{ secrets.BOT2_TOKEN }}
+          DEV_API_HASH: ${{ secrets.DEV_API_HASH }}
+          DEV_API_ID: ${{ secrets.DEV_API_ID }}
+          FROOT_STICKER_ID: ${{ secrets.FROOT_STICKER_ID }}
+          FROOT2_STICKER_ID: ${{ secrets.FROOT2_STICKER_ID }}
