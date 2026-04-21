@@ -29,12 +29,12 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
           path: repo2
           
-      - name: Checkout repo 3
-        uses: actions/checkout@v3
-        with:
-          repository: ${{ secrets.USERNAME }}/${{ secrets.CORE3 }}
-          token: ${{ secrets.GH_TOKEN }}
-          path: repo3
+      # - name: Checkout repo 3
+      #   uses: actions/checkout@v3
+      #   with:
+      #     repository: ${{ secrets.USERNAME }}/${{ secrets.CORE3 }}
+      #     token: ${{ secrets.GH_TOKEN }}
+      #     path: repo3
 
       - name: Setup Python
         uses: actions/setup-python@v4
@@ -77,7 +77,7 @@ jobs:
               echo "[$NAME] crashed with exit code $EXIT_CODE"
               echo "[$NAME] Restarting in 5 seconds..."
 
-              sleep 5
+              sleep 10
             done
           }
 
@@ -96,12 +96,12 @@ jobs:
           
           sleep 3
 
-          run_bot "Bot 3" repo3 "$BOT3_TOKEN" "$FROOT3_STICKER_ID" &
-          PID3=$!
+          # run_bot "Bot 3" repo3 "$BOT3_TOKEN" "$FROOT3_STICKER_ID" &
+          # PID3=$!
 
           echo "Bot 1 PID: $PID1"
           echo "Bot 2 PID: $PID2"
-          echo "Bot 3 PID: $PID3"
+          # echo "Bot 3 PID: $PID3"
 
           # Watchdog loop
           while true
@@ -120,14 +120,14 @@ jobs:
               echo "Bot 2 new PID: $PID2"
             fi
 
-            if ! is_running $PID3; then
-              echo "Bot 3 died. Restarting..."
-              run_bot "Bot 3" repo3 "$BOT3_TOKEN" "$FROOT3_STICKER_ID" &
-              PID3=$!
-              echo "Bot 3 new PID: $PID3"
-            fi
+            # if ! is_running $PID3; then
+            #   echo "Bot 3 died. Restarting..."
+            #   run_bot "Bot 3" repo3 "$BOT3_TOKEN" "$FROOT3_STICKER_ID" &
+            #   PID3=$!
+            #   echo "Bot 3 new PID: $PID3"
+            # fi
 
-            sleep 10
+            sleep 60
           done
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
