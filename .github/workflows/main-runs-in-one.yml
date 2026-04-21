@@ -50,28 +50,35 @@ jobs:
           run_bot () {
             NAME=$1
             DIR=$2
-
+            TOKEN=$3
+            STICKER=$4
+          
             while true
             do
               echo "$NAME started at $(date)"
-              cd $DIR
-
-              python hfmain.py
+          
+              (
+                cd $DIR
+          
+                BOT_TOKEN=$TOKEN \
+                FROOT_STICKER_ID=$STICKER \
+                python hfmain.py
+              )
+          
               EXIT_CODE=$?
-
+          
               echo "$NAME crashed with exit code $EXIT_CODE"
               echo "Restarting in 5 seconds..."
-
-              cd ..
+          
               sleep 5
             done
           }
 
           # Run both bots in background
-          run_bot "Bot 1" repo1 &
+          run_bot "Bot 1" repo1 "$BOT_TOKEN" "$FROOT_STICKER_ID" &
           PID1=$!
-
-          run_bot "Bot 2" repo2 &
+          
+          run_bot "Bot 2" repo2 "$BOT2_TOKEN" "$FROOT2_STICKER_ID" &
           PID2=$!
 
           # Watchdog loop
