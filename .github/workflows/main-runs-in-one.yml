@@ -52,48 +52,59 @@ jobs:
             DIR=$2
             TOKEN=$3
             STICKER=$4
-          
+
             while true
             do
-              echo "$NAME started at $(date)"
-          
+              echo "[$NAME | PID $$] started at $(date)"
+
               (
                 cd $DIR
-          
+
                 BOT_TOKEN=$TOKEN \
                 FROOT_STICKER_ID=$STICKER \
-                python hfmain.py
+                python hfmain.py >> ../${NAME// /_}.log 2>&1
               )
-          
+
               EXIT_CODE=$?
-          
-              echo "$NAME crashed with exit code $EXIT_CODE"
-              echo "Restarting in 5 seconds..."
-          
+
+              echo "[$NAME] crashed with exit code $EXIT_CODE"
+              echo "[$NAME] Restarting in 5 seconds..."
+
               sleep 5
             done
           }
 
-          # Run both bots in background
+          is_running () {
+            kill -0 $1 2>/dev/null
+          }
+
+          # Start bots
           run_bot "Bot 1" repo1 "$BOT_TOKEN" "$FROOT_STICKER_ID" &
           PID1=$!
-          
+
+          sleep 3
+
           run_bot "Bot 2" repo2 "$BOT2_TOKEN" "$FROOT2_STICKER_ID" &
           PID2=$!
+
+          echo "Bot 1 PID: $PID1"
+          echo "Bot 2 PID: $PID2"
 
           # Watchdog loop
           while true
           do
-            if ! kill -0 $PID1 2>/dev/null; then
-              echo "Bot 1 process died unexpectedly. Restarting..."
-              run_bot "Bot 1" repo1 &
+            if ! is_running $PID1; then
+              echo "Bot 1 died. Restarting..."
+              run_bot "Bot 1" repo1 "$BOT_TOKEN" "$FROOT_STICKER_ID" &
               PID1=$!
+              echo "Bot 1 new PID: $PID1"
             fi
 
-            if ! kill -0 $PID2 2>/dev/null; then
-              echo "Bot 2 process died unexpectedly. Restarting..."
-              run_bot "Bot 2" repo2 &
+            if ! is_running $PID2; then
+              echo "Bot 2 died. Restarting..."
+              run_bot "Bot 2" repo2 "$BOT2_TOKEN" "$FROOT2_STICKER_ID" &
               PID2=$!
+              echo "Bot 2 new PID: $PID2"
             fi
 
             sleep 10
