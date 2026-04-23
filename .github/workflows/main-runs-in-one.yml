@@ -36,6 +36,13 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
           path: repo3
 
+      - name: Checkout repo 4
+        uses: actions/checkout@v3
+        with:
+          repository: ${{ secrets.USERNAME }}/${{ secrets.CORE4 }}
+          token: ${{ secrets.GH_TOKEN }}
+          path: repo4
+          
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
@@ -99,9 +106,15 @@ jobs:
           run_bot "Bot 3" repo3 "$BOT3_TOKEN" "$FROOT3_STICKER_ID" &
           PID3=$!
 
+          sleep 3
+
+          run_bot "Bot 4" repo4 "$BOT4_TOKEN" "$FROOT4_STICKER_ID" &
+          PID4=$!
+
           echo "Bot 1 PID: $PID1"
           echo "Bot 2 PID: $PID2"
           echo "Bot 3 PID: $PID3"
+          echo "Bot 4 PID: $PID4"
 
           # Watchdog loop
           while true
@@ -127,14 +140,23 @@ jobs:
               echo "Bot 3 new PID: $PID3"
             fi
 
+            if ! is_running $PID4; then
+              echo "Bot 4 died. Restarting..."
+              run_bot "Bot 4" repo4 "$BOT4_TOKEN" "$FROOT4_STICKER_ID" &
+              PID4=$!
+              echo "Bot 4 new PID: $PID4"
+            fi
+            
             sleep 60
           done
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           BOT2_TOKEN: ${{ secrets.BOT2_TOKEN }}
           BOT3_TOKEN: ${{ secrets.BOT3_TOKEN }}
+          BOT4_TOKEN: ${{ secrets.BOT4_TOKEN }}
           DEV_API_HASH: ${{ secrets.DEV_API_HASH }}
           DEV_API_ID: ${{ secrets.DEV_API_ID }}
           FROOT_STICKER_ID: ${{ secrets.FROOT_STICKER_ID }}
           FROOT2_STICKER_ID: ${{ secrets.FROOT2_STICKER_ID }}
           FROOT3_STICKER_ID: ${{ secrets.FROOT2_STICKER_ID }}
+          FROOT4_STICKER_ID: ${{ secrets.FROOT4_STICKER_ID }}
