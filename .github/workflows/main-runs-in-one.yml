@@ -2,8 +2,8 @@ name: Run all in one
 
 on:
   workflow_dispatch:
-  # schedule:
-    # - cron: "0 */5 * * *"
+  schedule:
+     - cron: "0 */5 * * *"
 
 concurrency:
   group: all-main-runner-in-one
